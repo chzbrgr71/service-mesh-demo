@@ -5,17 +5,6 @@ var bodyParser = require('body-parser'),
 
 var apiRouter = require('./routes/api')
 
-const appInsights = require('applicationinsights')
-appInsights.setup()
-    .setAutoDependencyCorrelation(true)
-    .setAutoCollectRequests(true)
-    .setAutoCollectPerformance(true)
-    .setAutoCollectExceptions(true)
-    .setAutoCollectDependencies(true)
-    .setAutoCollectConsole(true)
-    .setUseDiskRetryCaching(true)
-    .start()
-
 var app = express()
 
 app.use(logger('dev'))

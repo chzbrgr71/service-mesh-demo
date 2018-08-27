@@ -11,17 +11,6 @@ mongoose.Promise = global.Promise
 
 var apiRouter = require('./routes/api')
 
-const appInsights = require('applicationinsights')
-appInsights.setup()
-    .setAutoDependencyCorrelation(true)
-    .setAutoCollectRequests(true)
-    .setAutoCollectPerformance(true)
-    .setAutoCollectExceptions(true)
-    .setAutoCollectDependencies(true)
-    .setAutoCollectConsole(true)
-    .setUseDiskRetryCaching(true)
-    .start()
-
 var app = express()
 
 mongoose.connect(process.env.MONGODB_URI, {
