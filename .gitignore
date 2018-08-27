@@ -1,3 +1,8 @@
+.DS_Store
+**/.DS_Store
+.vscode
+**/.vscode
+
 # Logs
 logs
 *.log
@@ -59,3 +64,9 @@ typings/
 
 # next.js build output
 .next
+
+.DS_STORE
+
+# Certificates and Keys
+labs/security/secure-tiller/*.pem
+labs/security/secure-tiller/*.srl
