@@ -17,11 +17,6 @@ app.use(function(req, res, next) {
 })
 
 app.use(function(req, res, next) {
-  
-  /* AppInsights request tracking for GET and POST */
-  if ( req.method === 'GET' || req.method === 'POST' ) {
-    appInsights.defaultClient.trackNodeHttpRequest({request: req, response: res})
-  }
 
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader(

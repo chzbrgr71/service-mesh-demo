@@ -22,12 +22,10 @@ mongoose.connect(process.env.MONGODB_URI, {
 var db = mongoose.connection
 
 db.on('error', (err) => {
-  appInsights.defaultClient.trackEvent({name: 'MongoConnError'})
   console.log(err)
 })
 
 db.once('open', () => {
-  appInsights.defaultClient.trackEvent({name: 'MongoConnSuccess'})
   console.log('connection success with Mongo')
 })
 
@@ -41,11 +39,6 @@ app.use(function(req, res, next) {
 })
 
 app.use(function(req, res, next) {
-  
-  /* AppInsights request tracking for GET and POST */
-  if ( req.method === 'GET' || req.method === 'POST' ) {
-    appInsights.defaultClient.trackNodeHttpRequest({request: req, response: res})
-  }
 
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader(

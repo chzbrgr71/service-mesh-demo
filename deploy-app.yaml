@@ -35,7 +35,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: spec.nodeName
-        image: chzbrgr71/geo-dashboard:v1
+        image: chzbrgr71/geo-dashboard:v2
         imagePullPolicy: Always
         name: geo-dashboard
         ports:
@@ -75,14 +75,12 @@ spec:
         app: flights-api
     spec:
       containers:
-        - image: chzbrgr71/flights-api:v1
+        - image: chzbrgr71/flights-api:v2
           imagePullPolicy: Always
           name: flights-api
           env:
             - name: DATA_SERVICE_URI
-              value: http://node-data-api:3009/
-            - name: CACHE_SERVICE_URI
-              value: http://node-cache-api:3006/       
+              value: http://data-api:3009/
           ports:
           - containerPort: 3003
             protocol: TCP
@@ -118,7 +116,7 @@ spec:
         app: data-api
     spec:
       containers:
-        - image: chzbrgr71/data-api:v1
+        - image: chzbrgr71/data-api:v2
           imagePullPolicy: Always
           name: data-api
           env:

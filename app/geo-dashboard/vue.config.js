@@ -1,13 +1,6 @@
 const webpack = require('webpack')
 
 module.exports = {
-   plugins: [
-     new webpack.DefinePlugin({
-       'process.env': {
-         'APPINSIGHTS_INSTRUMENTATIONKEY': JSON.stringify(process.env.APPINSIGHTS_INSTRUMENTATIONKEY),
-       }
-     })
-   ],
  lintOnSave: false,
   devServer: {
     proxy: {
