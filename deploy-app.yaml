@@ -1,0 +1,143 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: geo-dashboard
+  labels:
+    name: geo-dashboard
+spec:
+  type: LoadBalancer
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080
+  selector:
+    app: geo-dashboard
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: geo-dashboard
+  labels:
+    app: geo-dashboard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: geo-dashboard
+  template:
+    metadata:
+      labels:
+        app: geo-dashboard
+    spec:
+      containers:
+      - env:
+        - name: KUBE_NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        image: chzbrgr71/geo-dashboard:v1
+        imagePullPolicy: Always
+        name: geo-dashboard
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flights-api
+  labels:
+    name: flights-api
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 3003
+    targetPort: 3003
+  selector:
+    app: flights-api
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flights-api
+  labels:
+    app: flights-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flights-api
+  template:
+    metadata:
+      labels:
+        app: flights-api
+    spec:
+      containers:
+        - image: chzbrgr71/flights-api:v1
+          imagePullPolicy: Always
+          name: flights-api
+          env:
+            - name: DATA_SERVICE_URI
+              value: http://node-data-api:3009/
+            - name: CACHE_SERVICE_URI
+              value: http://node-cache-api:3006/       
+          ports:
+          - containerPort: 3003
+            protocol: TCP
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: data-api
+  labels:
+    name: data-api
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 3009
+    targetPort: 3009
+  selector:
+    app: data-api
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: data-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: data-api
+  template:
+    metadata:
+      labels:
+        app: data-api
+    spec:
+      containers:
+        - image: chzbrgr71/data-api:v1
+          imagePullPolicy: Always
+          name: data-api
+          env:
+            - name: MONGODB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: cosmos-db-secret
+                  key: uri
+            - name: MONGODB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: cosmos-db-secret
+                  key: user
+            - name: MONGODB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cosmos-db-secret
+                  key: pwd                 
+          ports:
+          - containerPort: 3009
+            protocol: TCP
+      restartPolicy: Always
