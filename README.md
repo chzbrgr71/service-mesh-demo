@@ -46,3 +46,27 @@ Demo application for upcoming events.
     kubectl port-forward flights-api-5d4886f788-rwbdq 3003:3003
     http://localhost:3003/refresh
     ```
+
+### Linkerd 2.0
+
+https://linkerd.io/2/getting-started 
+
+* Install the CLI
+
+* Install control plane: ```linkerd install | kubectl apply -f -```
+
+* Add the app
+    ```
+    linkerd inject deploy-app.yaml | kubectl apply -f -
+    ```
+
+### Do Stuff
+
+* Load test
+    ```
+    export APP_URL=http://137.135.113.90:8080/#/flights
+    export APP_URL=http://40.117.123.212:3003/current
+    export APP_URL=http://40.117.121.21:3009/get/flights/201808272052
+
+    while true; do curl -o /dev/null -s -w "%{http_code}\n" $APP_URL; sleep 1; done
+    ```
