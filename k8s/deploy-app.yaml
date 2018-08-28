@@ -31,11 +31,17 @@ spec:
     spec:
       containers:
       - env:
-        - name: KUBE_NODE_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: spec.nodeName
-        image: chzbrgr71/geo-dashboard:v2
+          - name: FLIGHT_API
+            value: http://localhost:3003/current
+          - name: WEATHER_API
+            value: http://localhost:3015/styling
+          - name: QUAKES_API
+            value: http://localhost:3012/latest
+          - name: KUBE_NODE_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+        image: briaracr.azurecr.io/chzbrgr71/service-tracker-ui:v3
         imagePullPolicy: Always
         name: geo-dashboard
         ports:
@@ -75,7 +81,7 @@ spec:
         app: flights-api
     spec:
       containers:
-        - image: chzbrgr71/flights-api:v2
+        - image: briaracr.azurecr.io/chzbrgr71/flights-api:v3
           imagePullPolicy: Always
           name: flights-api
           env:
@@ -116,7 +122,7 @@ spec:
         app: data-api
     spec:
       containers:
-        - image: chzbrgr71/data-api:v2
+        - image: briaracr.azurecr.io/chzbrgr71/data-api:v3
           imagePullPolicy: Always
           name: data-api
           env:

@@ -15,16 +15,20 @@ Demo application for upcoming events.
 
 * Create images
     ```
-    export VERSION=v2
+    export VERSION=v3
+    export ACRNAME=briaracr
 
     docker build -t chzbrgr71/data-api:$VERSION -f ./app/data-api/Dockerfile ./app/data-api
     docker push chzbrgr71/data-api:$VERSION
-
+    az acr build -t chzbrgr71/data-api:$VERSION -r $ACRNAME ./app/data-api
+    
     docker build -t chzbrgr71/flights-api:$VERSION -f ./app/flights-api/Dockerfile ./app/flights-api
     docker push chzbrgr71/flights-api:$VERSION
+    az acr build -t chzbrgr71/flights-api:$VERSION -r $ACRNAME ./app/flights-api
 
-    docker build -t chzbrgr71/geo-dashboard:$VERSION -f ./app/geo-dashboard/Dockerfile ./app/geo-dashboard
+    docker build -t chzbrgr71/service-tracker-ui:$VERSION -f ./app/service-tracker-ui/Dockerfile ./app/service-tracker-ui
     docker push chzbrgr71/geo-dashboard:$VERSION
+    az acr build -t chzbrgr71/service-tracker-ui:$VERSION -r $ACRNAME ./app/service-tracker-ui
     ```
 
 * Create kubernetes secret with cosmos credentials

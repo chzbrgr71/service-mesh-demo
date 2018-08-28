@@ -8,4 +8,4 @@ var latestSchema = new Schema({
     Created: {type: Date, default: Date.now}
 })
 
-mongoose.model('Latest', latestSchema, 'Latest')
+mongoose.model('LatestFlight', latestSchema, 'LatestFlight')

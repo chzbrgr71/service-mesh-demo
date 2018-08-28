@@ -1,12 +1,13 @@
-import DashboardLayout from "@/layout/dashboard/DashboardLayout.vue";
+import DashboardLayout from "@/layout/dashboard/DashboardLayout.vue"
 // GeneralViews
-import NotFound from "@/pages/NotFoundPage.vue";
+import NotFound from "@/pages/NotFoundPage.vue"
 
 // Admin pages
-import Dashboard from "@/pages/Dashboard.vue";
-import UserProfile from "@/pages/UserProfile.vue";
-import Flights from "@/pages/Flights.vue";
-import Quakes from "@/pages/Earthquakes.vue";
+import Dashboard from "@/pages/Dashboard.vue"
+import UserProfile from "@/pages/UserProfile.vue"
+import Flights from "@/pages/Flights.vue"
+import Quakes from "@/pages/Earthquakes.vue"
+import Weather from "@/pages/Weather.vue"
 
 const routes = [
   {
@@ -33,6 +34,11 @@ const routes = [
         path: "quakes",
         name: "quakes",
         component: Quakes
+      },
+      {
+        path: "weather",
+        name: "weather",
+        component: Weather
       }
     ]
   },

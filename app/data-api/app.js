@@ -2,14 +2,34 @@ var bodyParser = require('body-parser'),
     createError = require('http-errors'),
     express = require('express'),
     logger = require('morgan'),
-    mongoose = require('mongoose')
+    mongoose = require('mongoose'),
+    path = require('path')
+ 
+if (process.env.NODE_ENV != 'container') {
+  require('dotenv').config({path: path.join(__dirname, '.env.local')})
+}
     
 require('./models/mongo/flights')
-require('./models/mongo/latest')
+require('./models/mongo/latestFlight')
+require('./models/mongo/quakes')
+require('./models/mongo/latestQuake')
+require('./models/mongo/weather')
+require('./models/mongo/latestWeather')
     
 mongoose.Promise = global.Promise
 
 var apiRouter = require('./routes/api')
+
+const appInsights = require('applicationinsights')
+appInsights.setup()
+    .setAutoDependencyCorrelation(true)
+    .setAutoCollectRequests(true)
+    .setAutoCollectPerformance(true)
+    .setAutoCollectExceptions(true)
+    .setAutoCollectDependencies(true)
+    .setAutoCollectConsole(true)
+    .setUseDiskRetryCaching(true)
+    .start()
 
 var app = express()
 
@@ -22,10 +42,12 @@ mongoose.connect(process.env.MONGODB_URI, {
 var db = mongoose.connection
 
 db.on('error', (err) => {
+  appInsights.defaultClient.trackEvent({name: 'MongoConnError'})
   console.log(err)
 })
 
 db.once('open', () => {
+  appInsights.defaultClient.trackEvent({name: 'MongoConnSuccess'})
   console.log('connection success with Mongo')
 })
 
@@ -39,6 +61,11 @@ app.use(function(req, res, next) {
 })
 
 app.use(function(req, res, next) {
+  
+  /* AppInsights request tracking for GET and POST */
+  if ( req.method === 'GET' || req.method === 'POST' ) {
+    appInsights.defaultClient.trackNodeHttpRequest({request: req, response: res})
+  }
 
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader(
