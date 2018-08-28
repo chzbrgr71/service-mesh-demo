@@ -1,0 +1,26 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: cosmos-db
+spec:
+  hosts:
+  - service-mesh-demo.documents.azure.com
+  addresses:
+  - 104.45.131.193/27
+  ports:
+  - number: 10255
+    protocol: mongo
+    name: mongo-port
+  resolution: NONE
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: opensky
+spec:
+  hosts:
+  - opensky-network.org
+  ports:
+  - number: 443
+    name: https
+    protocol: HTTPS

@@ -38,7 +38,7 @@ Demo application for upcoming events.
 
 * Deploy app
     ```
-    kubectl apply -f deploy-app.yaml
+    kubectl apply -f ./k8s/deploy-app.yaml
     ```
 
 * Load data into Cosmos
@@ -57,8 +57,29 @@ https://linkerd.io/2/getting-started
 
 * Add the app
     ```
-    linkerd inject deploy-app.yaml | kubectl apply -f -
+    linkerd inject ./k8s/deploy-app.yaml | kubectl apply -f -
     ```
+
+### Istio
+
+Using istio release 1.0.1
+
+https://istio.io/docs/setup/kubernetes/helm-install
+
+* Install via Helm
+
+kubectl apply -f install/kubernetes/helm/istio/templates/crds.yaml
+
+helm install install/kubernetes/helm/istio --name istio --namespace istio-system --set grafana.enabled=true --set servicegraph.enabled=true --set tracing.enabled=true
+
+kubectl label namespace default istio-injection=enabled
+kubectl get namespace -L istio-injection
+
+* Add Egress rules. 
+    ```
+    kubectl apply -f ./k8s/istio-egress.yaml
+    ```
+
 
 ### Do Stuff
 
@@ -67,6 +88,9 @@ https://linkerd.io/2/getting-started
     export APP_URL=http://137.135.113.90:8080/#/flights
     export APP_URL=http://40.117.123.212:3003/current
     export APP_URL=http://40.117.121.21:3009/get/flights/201808272052
+    
+    export APP_URL=http://137.135.118.92:8080/#/flights
+    export APP_URL=http://40.121.7.125:3003/current
 
     while true; do curl -o /dev/null -s -w "%{http_code}\n" $APP_URL; sleep 1; done
     ```
