@@ -62,7 +62,6 @@ https://linkerd.io/2/getting-started
 * Add the app
     ```
     linkerd inject ./k8s/deploy-app.yaml | kubectl apply -f -
-    linkerd inject ./k8s/deploy-app2.yaml | kubectl apply -f -
     ```
 
 ### Istio
