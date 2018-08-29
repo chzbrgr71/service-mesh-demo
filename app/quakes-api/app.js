@@ -2,21 +2,12 @@ var bodyParser = require('body-parser'),
     createError = require('http-errors'),
     express = require('express'),
     logger = require('morgan'),
-    mongoose = require('mongoose'),
     path = require('path')
- 
+    
 if (process.env.NODE_ENV != 'container') {
   require('dotenv').config({path: path.join(__dirname, '.env.local')})
 }
-    
-require('./models/mongo/flights')
-require('./models/mongo/latestFlight')
-require('./models/mongo/quakes')
-require('./models/mongo/latestQuake')
-require('./models/mongo/weather')
-require('./models/mongo/latestWeather')
-    
-mongoose.Promise = global.Promise
+
 
 var apiRouter = require('./routes/api')
 
@@ -32,24 +23,6 @@ appInsights.setup()
     .start()
 
 var app = express()
-
-mongoose.connect(process.env.MONGODB_URI, {
-  user: process.env.MONGODB_USER,
-  pass: process.env.MONGODB_PASSWORD,
-  useNewUrlParser: true
-})
-
-var db = mongoose.connection
-
-db.on('error', (err) => {
-  appInsights.defaultClient.trackEvent({name: 'MongoConnError'})
-  console.log(err)
-})
-
-db.once('open', () => {
-  appInsights.defaultClient.trackEvent({name: 'MongoConnSuccess'})
-  console.log('connection success with Mongo')
-})
 
 app.use(logger('dev'))
 app.use(bodyParser.json({limit:'2mb'}))
@@ -76,9 +49,6 @@ app.use(function(req, res, next) {
     'Access-Control-Allow-Headers',
     'X-Requested-With,content-type'
   )
-
-  res.append('Last-Modified', (new Date()).toUTCString())
-
   next()
 })
 
