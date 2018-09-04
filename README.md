@@ -89,8 +89,7 @@ kubectl get namespace -L istio-injection
 
 * Load test
     ```
-    export APP_URL=http://137.135.88.152:8080/#/flights
-    export APP_URL=http://23.96.38.118:3003/latest
-    
+    export APP_URL=http://23.96.62.115:8080/#/flights
+    export APP_URL=http://137.135.101.232:3003/latest
     while true; do curl -o /dev/null -s -w "%{http_code}\n" $APP_URL; sleep 1; done
     ```
