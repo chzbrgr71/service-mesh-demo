@@ -73,7 +73,7 @@ metadata:
   labels:
     app: flights-api
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: flights-api
@@ -118,7 +118,7 @@ metadata:
   labels:
     app: quakes-api
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: quakes-api
@@ -163,7 +163,7 @@ metadata:
   labels:
     app: weather-api
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: weather-api
@@ -206,7 +206,7 @@ kind: Deployment
 metadata:
   name: data-api
 spec:
-  replicas: 1
+  replicas: 6
   selector:
     matchLabels:
       app: data-api

@@ -49,6 +49,8 @@ Demo application for upcoming events.
     ```
     kubectl port-forward flights-api-5d4886f788-rwbdq 3003:3003
     http://localhost:3003/refresh
+
+
     ```
 
 ### Linkerd 2.0
@@ -109,8 +111,8 @@ kubectl get namespace -L istio-injection
 
     ```
     for i in 1 2 3 4 5; do
-        az container create --name flights-load-test${i} -l eastus --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=5 load_url=137.135.101.232:3003/latest
-        az container create --name quakes-load-test${i} -l eastus --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=5 load_url=40.114.85.229:3012/latest
+        az container create --name flights-load-test${i} -l eastus --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=1 load_url=104.211.27.252:3003/latest
+        az container create --name quakes-load-test${i} -l eastus --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=1 load_url=40.87.95.20:3012/latest
     done
 
     for i in 1 2 3 4 5; do
@@ -118,3 +120,4 @@ kubectl get namespace -L istio-injection
         az container delete --yes --resource-group aci --name quakes-load-test${i}
     done
     ```
+    http://104.211.27.57:8080 
