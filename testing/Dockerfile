@@ -1,10 +1,11 @@
 FROM node:10.9.0-alpine
 
 WORKDIR /usr/src/app
-COPY *.yaml ./
 RUN npm -g config set user root
 RUN npm -g install artillery
+ENV load_duration 1
+ENV load_rate 1
+ENV load_url google.com
 
 COPY . .
-
-CMD [ "artillery", "run", "data-api-load.yaml" ]
+ENTRYPOINT artillery quick -d ${load_duration} -r ${load_rate} http://${load_url}

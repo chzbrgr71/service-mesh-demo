@@ -88,8 +88,33 @@ kubectl get namespace -L istio-injection
 ### Do Stuff
 
 * Load test
+
+    via bash
+
     ```
     export APP_URL=http://23.96.62.115:8080/#/flights
     export APP_URL=http://137.135.101.232:3003/latest
     while true; do curl -o /dev/null -s -w "%{http_code}\n" $APP_URL; sleep 1; done
+    ```
+
+    via container
+
+    ```
+    docker run -d --name load-test1 -e "load_duration=-1" -e "load_rate=1" -e "load_url=137.135.101.232:3003/latest" chzbrgr71/loadtest
+
+    az container create --name load-test1 --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=5 load_url=137.135.101.232:3003/latest
+
+    az container delete --yes --resource-group aci --name load-test1
+    ```
+
+    ```
+    for i in 1 2 3 4 5; do
+        az container create --name flights-load-test${i} -l eastus --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=5 load_url=137.135.101.232:3003/latest
+        az container create --name quakes-load-test${i} -l eastus --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=5 load_url=40.114.85.229:3012/latest
+    done
+
+    for i in 1 2 3 4 5; do
+        az container delete --yes --resource-group aci --name flights-load-test${i}
+        az container delete --yes --resource-group aci --name quakes-load-test${i}
+    done
     ```
