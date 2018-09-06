@@ -70,10 +70,19 @@ router.get('/latest', (req, res, next) => {
 
         }
     ],(e,r) => {
-        jsonResponse.json( res, st.OK.msg, st.OK.code, r)
+        setTimeoutAsync(function () {
+            jsonResponse.json( res, st.OK.msg, st.OK.code, r)
+        }, Math.floor(Math.random() * 5000) + 1);        
     })
 
 })
+
+function setTimeoutAsync(callback, time) {
+    setTimeout(function () {
+        callback()
+    }, time)
+    return 0
+}
 
 /**
  * 
