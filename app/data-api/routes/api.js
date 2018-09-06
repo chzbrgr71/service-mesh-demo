@@ -1,5 +1,4 @@
-var applicationInsights = require('applicationinsights'),
-    async = require('async'),
+var async = require('async'),
     express = require('express'),
     jsonResponse = require('../models/express/jsonResponse'),
     moment = require('moment'),
@@ -16,8 +15,6 @@ var Flights = mongoose.model('Flights'),
     LatestQuake = mongoose.model('LatestQuake'),
     Weather = mongoose.model('Weather'),
     LatestWeather = mongoose.model('LatestWeather')
-
-var telemetry = applicationInsights.defaultClient
 
 const routename = path.basename(__filename).replace('.js', ' default endpoint for ' + site.name)
 

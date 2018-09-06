@@ -5,7 +5,6 @@ module.exports = {
    plugins: [
      new webpack.DefinePlugin({
        'process.env': {
-         'APPINSIGHTS_INSTRUMENTATIONKEY': JSON.stringify(process.env.APPINSIGHTS_INSTRUMENTATIONKEY),
          'FLIGHT_API': JSON.stringify(process.env.FLIGHT_API),
          'WEATHER_API': JSON.stringify(process.env.WEATHER_API),
          'QUAKES_API': JSON.stringify(process.env.QUAKES_API)
@@ -21,7 +20,6 @@ module.exports = {
           quakes: process.env.QUAKES_API,
           weather: process.env.WEATHER_API,
           flights: process.env.FLIGHT_API,
-          insights: process.env.APPINSIGHTS_INSTRUMENTATIONKEY
          }
         res.json({ custom: currentEnv })
       })
