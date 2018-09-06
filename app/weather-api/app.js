@@ -11,17 +11,6 @@ if (process.env.NODE_ENV != 'container') {
 
 var apiRouter = require('./routes/api')
 
-const appInsights = require('applicationinsights')
-appInsights.setup()
-    .setAutoDependencyCorrelation(true)
-    .setAutoCollectRequests(true)
-    .setAutoCollectPerformance(true)
-    .setAutoCollectExceptions(true)
-    .setAutoCollectDependencies(true)
-    .setAutoCollectConsole(true)
-    .setUseDiskRetryCaching(true)
-    .start()
-
 var app = express()
 
 app.use(logger('dev'))
@@ -34,11 +23,6 @@ app.use(function(req, res, next) {
 })
 
 app.use(function(req, res, next) {
-  
-  /* AppInsights request tracking for GET and POST */
-  if ( req.method === 'GET' || req.method === 'POST' ) {
-    appInsights.defaultClient.trackNodeHttpRequest({request: req, response: res})
-  }
 
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader(

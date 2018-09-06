@@ -37,13 +37,11 @@ spec:
             value: http://weather-api:3015/styling
           - name: QUAKES_API
             value: http://quakes-api:3012/latest
-          - name: APPINSIGHTS_INSTRUMENTATIONKEY
-            value: 6dc23005-a1d0-418a-82bd-b232498b5221
           - name: KUBE_NODE_NAME
             valueFrom:
               fieldRef:
                 fieldPath: spec.nodeName
-        image: briaracr.azurecr.io/hackfest/service-tracker-ui:v4
+        image: briaracr.azurecr.io/hackfest/service-tracker-ui:v5
         imagePullPolicy: Always
         name: service-tracker-ui
         ports:
@@ -83,14 +81,12 @@ spec:
         app: flights-api
     spec:
       containers:
-        - image: briaracr.azurecr.io/hackfest/flights-api:v4
+        - image: briaracr.azurecr.io/hackfest/flights-api:v5
           imagePullPolicy: Always
           name: flights-api
           env:
             - name: DATA_SERVICE_URI
               value: http://data-api:3009/
-            - name: APPINSIGHTS_INSTRUMENTATIONKEY
-              value: 6dc23005-a1d0-418a-82bd-b232498b5221
           ports:
           - containerPort: 3003
             protocol: TCP
@@ -128,14 +124,12 @@ spec:
         app: quakes-api
     spec:
       containers:
-        - image: briaracr.azurecr.io/hackfest/quakes-api:v4
+        - image: briaracr.azurecr.io/hackfest/quakes-api:v5
           imagePullPolicy: Always
           name: quakes-api
           env:
             - name: DATA_SERVICE_URI
               value: http://data-api:3009/
-            - name: APPINSIGHTS_INSTRUMENTATIONKEY
-              value: 6dc23005-a1d0-418a-82bd-b232498b5221
           ports:
           - containerPort: 3012
             protocol: TCP
@@ -173,14 +167,12 @@ spec:
         app: weather-api
     spec:
       containers:
-        - image: briaracr.azurecr.io/hackfest/weather-api:v4
+        - image: briaracr.azurecr.io/hackfest/weather-api:v5
           imagePullPolicy: Always
           name: weather-api
           env:
             - name: DATA_SERVICE_URI
               value: http://data-api:3009/
-            - name: APPINSIGHTS_INSTRUMENTATIONKEY
-              value: 6dc23005-a1d0-418a-82bd-b232498b5221
           ports:
           - containerPort: 3015
             protocol: TCP
@@ -216,7 +208,7 @@ spec:
         app: data-api
     spec:
       containers:
-        - image: briaracr.azurecr.io/hackfest/data-api:v4
+        - image: briaracr.azurecr.io/hackfest/data-api:v5
           imagePullPolicy: Always
           name: data-api
           env:
@@ -234,9 +226,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: cosmos-db-secret
-                  key: pwd     
-            - name: APPINSIGHTS_INSTRUMENTATIONKEY
-              value: 6dc23005-a1d0-418a-82bd-b232498b5221
+                  key: pwd
           ports:
           - containerPort: 3009
             protocol: TCP

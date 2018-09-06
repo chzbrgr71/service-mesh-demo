@@ -1,5 +1,4 @@
-var applicationInsights = require('applicationinsights'),
-    async = require('async'),
+var async = require('async'),
     cacheServiceUri = process.env.CACHE_SERVICE_URI,
     dataServiceUri = process.env.DATA_SERVICE_URI,
     express = require('express'),
@@ -17,9 +16,6 @@ var applicationInsights = require('applicationinsights'),
     
     styleExample = require('../resources/styleExample')
     
-
-
-var telemetry = applicationInsights.defaultClient
 const routename = path.basename(__filename).replace('.js', ' default endpoint for ' + site.name)
 
 var accuweatherBaseUrl = 'http://dataservice.accuweather.com/'

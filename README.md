@@ -15,20 +15,20 @@ Demo application for upcoming events.
 
 * Create images
     ```
-    export VERSION=v3
+    export VERSION=v5
     export ACRNAME=briaracr
 
-    docker build -t chzbrgr71/data-api:$VERSION -f ./app/data-api/Dockerfile ./app/data-api
-    docker push chzbrgr71/data-api:$VERSION
-    az acr build -t chzbrgr71/data-api:$VERSION -r $ACRNAME ./app/data-api
-    
-    docker build -t chzbrgr71/flights-api:$VERSION -f ./app/flights-api/Dockerfile ./app/flights-api
-    docker push chzbrgr71/flights-api:$VERSION
-    az acr build -t chzbrgr71/flights-api:$VERSION -r $ACRNAME ./app/flights-api
+    docker build -t hackfest/data-api:$VERSION -f ./app/data-api/Dockerfile ./app/data-api
+    docker build -t hackfest/flights-api:$VERSION -f ./app/flights-api/Dockerfile ./app/flights-api
+    docker build -t hackfest/quakes-api:$VERSION -f ./app/flights-api/Dockerfile ./app/quakes-api
+    docker build -t hackfest/weather-api:$VERSION -f ./app/flights-api/Dockerfile ./app/weather-api
+    docker build -t hackfest/service-tracker-ui:$VERSION -f ./app/service-tracker-ui/Dockerfile ./app/service-tracker-ui
 
-    docker build -t chzbrgr71/service-tracker-ui:$VERSION -f ./app/service-tracker-ui/Dockerfile ./app/service-tracker-ui
-    docker push chzbrgr71/geo-dashboard:$VERSION
-    az acr build -t chzbrgr71/service-tracker-ui:$VERSION -r $ACRNAME ./app/service-tracker-ui
+    az acr build -t hackfest/data-api:$VERSION -r $ACRNAME ./app/data-api
+    az acr build -t hackfest/flights-api:$VERSION -r $ACRNAME ./app/flights-api
+    az acr build -t hackfest/quakes-api:$VERSION -r $ACRNAME ./app/quakes-api
+    az acr build -t hackfest/weather-api:$VERSION -r $ACRNAME ./app/weather-api
+    az acr build -t hackfest/service-tracker-ui:$VERSION -r $ACRNAME ./app/service-tracker-ui
     ```
 
 * Create kubernetes secret with cosmos credentials
@@ -40,7 +40,7 @@ Demo application for upcoming events.
     kubectl create secret generic cosmos-db-secret --from-literal=uri=$MONGODB_URI --from-literal=user=$MONGODB_USER --from-literal=pwd=$MONGODB_PASSWORD
     ```
 
-* Deploy app
+* Deploy app (without Service Mesh)
     ```
     kubectl apply -f ./k8s/deploy-app.yaml
     ```
