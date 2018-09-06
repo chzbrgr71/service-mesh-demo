@@ -15,7 +15,7 @@ Demo application for upcoming events.
 
 * Create images
     ```
-    export VERSION=v5
+    export VERSION=v5.1
     export ACRNAME=briaracr
 
     docker build -t hackfest/data-api:$VERSION -f ./app/data-api/Dockerfile ./app/data-api
@@ -111,13 +111,29 @@ kubectl get namespace -L istio-injection
 
     ```
     for i in 1 2 3 4 5; do
-        az container create --name flights-load-test${i} -l eastus --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=1 load_url=104.211.27.252:3003/latest
-        az container create --name quakes-load-test${i} -l eastus --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=1 load_url=40.87.95.20:3012/latest
+        az container create --name flights-load-test${i} -l eastus --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=1 load_url=40.121.107.138:3003/latest
+        az container create --name quakes-load-test${i} -l eastus --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=1 load_url=40.114.68.113:3012/latest
     done
 
     for i in 1 2 3 4 5; do
         az container delete --yes --resource-group aci --name flights-load-test${i}
         az container delete --yes --resource-group aci --name quakes-load-test${i}
     done
+
+    # single instance
+    az container create --name flights-load-test1 -l eastus --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=2 load_url=40.121.107.138:3003/latest
+    az container create --name quakes-load-test1 -l eastus --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=2 load_url=40.114.68.113:3012/latest
+
+    az container delete --yes --resource-group aci --name flights-load-test1
+    az container delete --yes --resource-group aci --name quakes-load-test1
     ```
-    http://104.211.27.57:8080 
+    Web UI: http://40.76.10.96:8080 
+
+
+    Change deployment image tag:
+    ```
+    kubectl set image deployment/quakes-api quakes-api=briaracr.azurecr.io/hackfest/quakes-api:v5
+
+    kubectl set image deployment/quakes-api quakes-api=briaracr.azurecr.io/hackfest/quakes-api:v5.1
+    kubectl set image deployment/flights-api flights-api=briaracr.azurecr.io/hackfest/flights-api:v5.1
+    ```

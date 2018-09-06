@@ -76,7 +76,8 @@ router.get('/latest', (req, res, next) => {
 
         }
     ],(e,r) => {
-        jsonResponse.json( res, st.OK.msg, st.OK.code, r)
+        //jsonResponse.json( res, st.OK.msg, st.OK.code, r)
+        res.json({}).status(404) 
     })
 
 })

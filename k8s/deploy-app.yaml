@@ -124,7 +124,7 @@ spec:
         app: quakes-api
     spec:
       containers:
-        - image: briaracr.azurecr.io/hackfest/quakes-api:v5
+        - image: briaracr.azurecr.io/hackfest/quakes-api:v5.1
           imagePullPolicy: Always
           name: quakes-api
           env:
