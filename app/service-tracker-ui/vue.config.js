@@ -19,7 +19,7 @@ module.exports = {
         var currentEnv = { 
           quakes: process.env.QUAKES_API,
           weather: process.env.WEATHER_API,
-          flights: process.env.FLIGHT_API,
+          flights: process.env.FLIGHT_API
          }
         res.json({ custom: currentEnv })
       })
