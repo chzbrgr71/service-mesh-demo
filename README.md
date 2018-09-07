@@ -15,7 +15,7 @@ Demo application for upcoming events.
 
 * Create images
     ```
-    export VERSION=v5.1
+    export VERSION=v5.12
     export ACRNAME=briaracr
 
     docker build -t hackfest/data-api:$VERSION -f ./app/data-api/Dockerfile ./app/data-api
@@ -135,5 +135,5 @@ kubectl get namespace -L istio-injection
     kubectl set image deployment/quakes-api quakes-api=briaracr.azurecr.io/hackfest/quakes-api:v5
 
     kubectl set image deployment/quakes-api quakes-api=briaracr.azurecr.io/hackfest/quakes-api:v5.1
-    kubectl set image deployment/flights-api flights-api=briaracr.azurecr.io/hackfest/flights-api:v5.1
+    kubectl set image deployment/flights-api flights-api=briaracr.azurecr.io/hackfest/flights-api:v5.12
     ```
