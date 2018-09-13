@@ -50,10 +50,17 @@ Demo application for upcoming events.
 
 * Load data into Cosmos for each api
     ```
-    kubectl port-forward flights-api-5d4886f788-rwbdq 3003:3003
+    kubectl get svc
+
+    NAME                 TYPE           CLUSTER-IP     EXTERNAL-IP      PORT(S)          AGE
+    data-api             LoadBalancer   10.0.189.95    40.114.33.42     3009:30176/TCP   8m
+    flights-api          LoadBalancer   10.0.204.253   40.76.219.242    3003:31739/TCP   8m
+    kubernetes           ClusterIP      10.0.0.1       <none>           443/TCP          43m
+    quakes-api           LoadBalancer   10.0.200.23    40.117.157.117   3012:30004/TCP   8m
+    service-tracker-ui   LoadBalancer   10.0.82.227    40.76.210.156    8080:31798/TCP   8m
+    weather-api          LoadBalancer   10.0.47.46     40.114.29.147    3015:32186/TCP   8m
     
-    
-    http://localhost:3003/refresh
+    eg: http://40.76.219.242:3003/refresh
     ```
 
 * Remove app to re-deploy with service mesh
@@ -61,7 +68,7 @@ Demo application for upcoming events.
     kubectl apply -f ./k8s/deploy-app.yaml
     ```
 
-### Linkerd 2.0
+### Linkerd2
 
 https://linkerd.io/2/getting-started 
 
@@ -74,7 +81,7 @@ https://linkerd.io/2/getting-started
     linkerd inject ./k8s/deploy-app.yaml | kubectl apply -f -
     ```
 
-### Istio
+### Istio (optional)
 
 Using istio release 1.0.1
 
@@ -102,7 +109,6 @@ kubectl get namespace -L istio-injection
     via bash
 
     ```
-    export APP_URL=http://23.96.62.115:8080/#/flights
     export APP_URL=http://137.135.101.232:3003/latest
     while true; do curl -o /dev/null -s -w "%{http_code}\n" $APP_URL; sleep 1; done
     ```
@@ -119,23 +125,27 @@ kubectl get namespace -L istio-injection
 
     ```
     for i in 1 2 3 4 5; do
-        az container create --name flights-load-test${i} -l eastus --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=1 load_url=40.121.107.138:3003/latest
-        az container create --name quakes-load-test${i} -l eastus --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=1 load_url=40.114.68.113:3012/latest
+        az container create --name flights-load-test${i} -l eastus --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=2 load_url=40.76.219.242:3003/latest
+        az container create --name quakes-load-test${i} -l eastus --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=2 load_url=40.117.157.117:3012/latest
+        az container create --name weather-load-test${i} -l eastus --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=2 load_url=40.114.29.147:3015/latest
     done
 
     for i in 1 2 3 4 5; do
         az container delete --yes --resource-group aci --name flights-load-test${i}
         az container delete --yes --resource-group aci --name quakes-load-test${i}
+        az container delete --yes --resource-group aci --name weather-load-test${i}
     done
 
     # single instance
-    az container create --name flights-load-test1 -l eastus --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=2 load_url=40.121.107.138:3003/latest
-    az container create --name quakes-load-test1 -l eastus --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=2 load_url=40.114.68.113:3012/latest
+    az container create --name flights-load-test1 -l eastus --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=2 load_url=40.76.219.242:3003/latest
+    az container create --name quakes-load-test1 -l eastus --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=2 load_url=40.117.157.117:3012/latest
+    az container create --name weather-load-test1 -l eastus --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=2 load_url=40.114.29.147:3015/latest
 
     az container delete --yes --resource-group aci --name flights-load-test1
     az container delete --yes --resource-group aci --name quakes-load-test1
+    az container delete --yes --resource-group aci --name weather-load-test1
     ```
-    Web UI: http://40.76.10.96:8080 
+    Web UI: http://40.76.210.156:8080
 
 
     Change deployment image tag:
