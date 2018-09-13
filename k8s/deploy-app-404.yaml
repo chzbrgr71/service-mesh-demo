@@ -125,7 +125,6 @@ spec:
     spec:
       containers:
         - image: briaracr.azurecr.io/hackfest/quakes-api:2.0
-        #- image: briaracr.azurecr.io/hackfest/quakes-api:slow-response
           imagePullPolicy: Always
           name: quakes-api
           env:
@@ -209,7 +208,7 @@ spec:
         app: data-api
     spec:
       containers:
-        - image: briaracr.azurecr.io/hackfest/data-api:2.0
+        - image: briaracr.azurecr.io/hackfest/data-api:weather-broken
           imagePullPolicy: Always
           name: data-api
           env:

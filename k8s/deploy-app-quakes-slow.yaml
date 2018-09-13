@@ -124,8 +124,8 @@ spec:
         app: quakes-api
     spec:
       containers:
-        - image: briaracr.azurecr.io/hackfest/quakes-api:2.0
-        #- image: briaracr.azurecr.io/hackfest/quakes-api:slow-response
+        #- image: briaracr.azurecr.io/hackfest/quakes-api:2.0
+        - image: briaracr.azurecr.io/hackfest/quakes-api:slow-response
           imagePullPolicy: Always
           name: quakes-api
           env:

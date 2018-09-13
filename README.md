@@ -28,6 +28,7 @@ Demo application for upcoming events.
     ```
     export VERSION=2.0
     export ACRNAME=briaracr
+    export VERSION=weather-broken
     export VERSION=slow-response
 
     docker build -t hackfest/data-api:$VERSION -f ./app/data-api/Dockerfile ./app/data-api
@@ -77,9 +78,13 @@ https://linkerd.io/2/getting-started
 
 * Install control plane: ```linkerd install | kubectl apply -f -```
 
-* Add the app
+* Deploy the app with linkerd sidecar injected
     ```
     linkerd inject ./k8s/deploy-app.yaml | kubectl apply -f -
+
+    linkerd inject ./k8s/deploy-app-404.yaml | kubectl apply -f -
+
+    linkerd inject ./k8s/deploy-app-quakes-slow.yaml | kubectl apply -f -
     ```
 
 ### Istio (optional)
@@ -156,35 +161,3 @@ kubectl get namespace -L istio-injection
     kubectl set image deployment/quakes-api quakes-api=briaracr.azurecr.io/hackfest/quakes-api:v5.1
     kubectl set image deployment/flights-api flights-api=briaracr.azurecr.io/hackfest/flights-api:v5.12
     ```
-
-### 404 Errors
-
-```
-router.get('/latest', (req, res, next) => {
-
-    async.waterfall([
-        (cb) => {
-            // get latest timestamp from DB
-            console.log('getting latest timestamp of flights')
-            var path = 'get/latest/flights'
-            getFromDataApi(path, (e, d) => {
-                cb(null, d.payload[0].Timestamp)
-            })
-        },
-        (timestamp, cb) => {
-            // use latest timestamp for flights from DB
-            console.log('getting latest flights based on timestamp')
-            var path = 'get/flights/' + timestamp
-            getFromDataApi(path, (e, d) => {
-                cb(null, d.payload.FeatureCollection)
-            })
-
-        }
-    ],(e,r) => {
-        //jsonResponse.json( res, st.OK.msg, st.OK.code, r)
-        //res.json({}).status(404) 
-        res.sendStatus(404)
-    })
-
-})
-```
