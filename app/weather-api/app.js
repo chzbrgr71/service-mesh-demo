@@ -8,7 +8,6 @@ if (process.env.NODE_ENV != 'container') {
   require('dotenv').config({path: path.join(__dirname, '.env.local')})
 }
 
-
 var apiRouter = require('./routes/api')
 
 var app = express()

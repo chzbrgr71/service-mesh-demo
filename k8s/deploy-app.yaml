@@ -31,17 +31,17 @@ spec:
     spec:
       containers:
       - env:
-          - name: FLIGHT_API
-            value: http://flights-api:3003/latest
-          - name: WEATHER_API
-            value: http://weather-api:3015/styling
-          - name: QUAKES_API
-            value: http://quakes-api:3012/latest
+          - name: FLIGHT_API_ROOT
+            value: http://flights-api:3003/
+          - name: WEATHER_API_ROOT
+            value: http://weather-api:3015/
+          - name: QUAKES_API_ROOT
+            value: http://quakes-api:3012/
           - name: KUBE_NODE_NAME
             valueFrom:
               fieldRef:
                 fieldPath: spec.nodeName
-        image: briaracr.azurecr.io/hackfest/service-tracker-ui:v5
+        image: briaracr.azurecr.io/hackfest/service-tracker-ui:2.0
         imagePullPolicy: Always
         name: service-tracker-ui
         ports:
@@ -81,7 +81,7 @@ spec:
         app: flights-api
     spec:
       containers:
-        - image: briaracr.azurecr.io/hackfest/flights-api:v5
+        - image: briaracr.azurecr.io/hackfest/flights-api:2.0
           imagePullPolicy: Always
           name: flights-api
           env:
@@ -124,7 +124,7 @@ spec:
         app: quakes-api
     spec:
       containers:
-        - image: briaracr.azurecr.io/hackfest/quakes-api:v5.1
+        - image: briaracr.azurecr.io/hackfest/quakes-api:2.0
           imagePullPolicy: Always
           name: quakes-api
           env:
@@ -167,7 +167,7 @@ spec:
         app: weather-api
     spec:
       containers:
-        - image: briaracr.azurecr.io/hackfest/weather-api:v5
+        - image: briaracr.azurecr.io/hackfest/weather-api:2.0
           imagePullPolicy: Always
           name: weather-api
           env:
@@ -208,7 +208,7 @@ spec:
         app: data-api
     spec:
       containers:
-        - image: briaracr.azurecr.io/hackfest/data-api:v5
+        - image: briaracr.azurecr.io/hackfest/data-api:2.0
           imagePullPolicy: Always
           name: data-api
           env:

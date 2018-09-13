@@ -4,7 +4,6 @@ var async = require('async'),
     express = require('express'),
     jsonResponse = require('../models/express/jsonResponse'),
     moment = require('moment'),
-    momentDuration = require('moment-duration-format'),
     path = require('path'),
     router = express.Router(),
     rp = require('request-promise'),
@@ -54,20 +53,36 @@ router.get('/latest', (req, res, next) => {
 
     async.waterfall([
         (cb) => {
-            getFromDataApi('get/latest/quakes', (e, d) => {
+            // get latest timestamp from DB
+            console.log('getting latest timestamp of quakes')
+            var path = 'get/latest/quakes'
+            getFromDataApi(path, (e, d) => {
                 cb(null, d.payload[0].Timestamp)
             })
         },
         (timestamp, cb) => {
-            getFromDataApi('get/quakes/' + timestamp, (e, d) => {
+            // use latest timestamp for flights from DB
+            console.log('getting latest quakes based on timestamp')
+            var path = 'get/quakes/' + timestamp
+            getFromDataApi(path, (e, d) => {
                 cb(null, d.payload.FeatureCollection)
             })
+
         }
     ],(e,r) => {
-        jsonResponse.json( res, st.OK.msg, st.OK.code, r)
+        setTimeoutAsync(function () {
+            jsonResponse.json( res, st.OK.msg, st.OK.code, r)
+        }, Math.floor(Math.random() * 5000) + 1);        
     })
 
 })
+
+function setTimeoutAsync(callback, time) {
+    setTimeout(function () {
+        callback()
+    }, time)
+    return 0
+}
 
 /**
  * 
@@ -82,12 +97,15 @@ router.get('/refresh', (req, res, next) => {
     
     async.waterfall([
         (cb) => {
+            console.log('getting quakes data')
             getQuakesData('refreshquakesdata', (err, data) => {
                 cb(null, data)
             })
         },
         (data, cb) => {
-            cb(null, data, moment(data.metadata.generated).format('YYYYMMDDHHmm').toString())
+            console.log('got quakes data with ', data.metadata.count, ' quakes')
+            var currenttime = moment.unix(data.metadata.generated).format('YYYYMMDDHHmm').toString()
+            cb(null, data, currenttime)
         },
         (data, timestamp, cb) => {
             cb(null, data.features, timestamp)
@@ -96,8 +114,10 @@ router.get('/refresh', (req, res, next) => {
             saveToDataApi(key, data, (e,r) => { 
                 cb(null, r)
             } )
+
         }], 
         (e, r) => {
+            console.log('posted data item - quakes')
             jsonResponse.json( res, st.OK.msg, st.OK.code, r)
     })
 
@@ -111,20 +131,7 @@ router.get('/refresh', (req, res, next) => {
  * 
  **/
 router.get('/status', (req, res, next) => {
-    
-    async.waterfall([
-        (cb) => {
-            getFromDataApi('get/latest/quakes', (e, d) => {
-                cb(null, d.payload[0].Timestamp)
-            })
-        }
-    ],(e,r) => {
-        jsonResponse.json( res, routename, st.OK.code, {
-            uptime: moment.duration(Math.floor(process.uptime())*1000).format('h [hrs], m [min]'), 
-            latest:moment(r.substr(0, 8) + 'T' + r.substr(8)).format('MM/DD/YYYY HH:mm a')
-        })
-    })
-
+    jsonResponse.json( res, routename, st.OK.code, {} )
 })
 
 /* USGS API */
@@ -211,6 +218,8 @@ function saveToDataApi(timestamp, data, cb) {
 /* DB API GET CALL */
 function getFromDataApi(path, cb){
     var url = dataServiceUri + path
+    
+    console.log(url)
     
     var opt = { uri: url,
         headers: { 'User-Agent': 'Request-Promise' },

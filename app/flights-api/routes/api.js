@@ -4,6 +4,7 @@ var async = require('async'),
     express = require('express'),
     jsonResponse = require('../models/express/jsonResponse'),
     moment = require('moment'),
+    momentDuration = require('moment-duration-format'),
     path = require('path'),
     router = express.Router(),
     rp = require('request-promise'),
@@ -59,26 +60,18 @@ router.get('/latest', (req, res, next) => {
 
     async.waterfall([
         (cb) => {
-            // get latest timestamp from DB
-            console.log('getting latest timestamp of flights')
-            var path = 'get/latest/flights'
-            getFromDataApi(path, (e, d) => {
+            getFromDataApi('get/latest/flights', (e, d) => {
                 cb(null, d.payload[0].Timestamp)
             })
         },
         (timestamp, cb) => {
-            // use latest timestamp for flights from DB
-            console.log('getting latest flights based on timestamp')
-            var path = 'get/flights/' + timestamp
-            getFromDataApi(path, (e, d) => {
+            getFromDataApi('get/flights/' + timestamp, (e, d) => {
                 cb(null, d.payload.FeatureCollection)
             })
 
         }
     ],(e,r) => {
-        //jsonResponse.json( res, st.OK.msg, st.OK.code, r)
-        //res.json({}).status(404) 
-        res.sendStatus(404)
+        jsonResponse.json( res, st.OK.msg, st.OK.code, r)
     })
 
 })
@@ -97,22 +90,15 @@ router.get('/refresh', (req, res, next) => {
     
     async.waterfall([
         (cb) => {
-            console.log('getting flight data')
             getFlightData(querypath, 'refreshflightdata', (err, data) => {
                 cb(null, data)
             })
         },
         (data, cb) => {
-            console.log('got flight data with ', data.states.length, ' flights')
-            var currenttime = moment.unix(data.time).format('YYYYMMDDHHmm').toString()
-            // postCacheItem('flighttime', currenttime, site.CACHE_SET_FLIGHT_TIME, (err, reply) => {
-                cb(null, data, currenttime)
-            // })
+            cb(null, data, moment.unix(data.time).format('YYYYMMDDHHmm').toString())
         },
         (data, timestamp, cb) => {
-            console.log('building geojson')
             buildGeoJson(data.states, (err, result) => { 
-                console.log(result)
                 cb(null, result, timestamp)
             })
         },
@@ -127,7 +113,6 @@ router.get('/refresh', (req, res, next) => {
 
         }], 
         (e, r) => {
-            console.log('posted data item - flights')
             jsonResponse.json( res, st.OK.msg, st.OK.code, r)
     })
 
@@ -141,7 +126,26 @@ router.get('/refresh', (req, res, next) => {
  * 
  **/
 router.get('/status', (req, res, next) => {
-    jsonResponse.json( res, routename, st.OK.code, {} )
+var start;
+var end;
+    async.waterfall([
+        (cb) => {
+            getFromDataApi('get/latest/flights', (e, d) => {
+                cb(null, d.payload[0].Timestamp)
+            })
+        }
+    ],(e,r) => {
+
+        // var dd = d.substring(0,8) + 'T'
+        // var hh = r.substring(8,4)
+        // console.log(dd)
+        // console.log(hh)
+        jsonResponse.json( res, routename, st.OK.code, {
+            uptime: moment.duration(Math.floor(process.uptime())*1000).format('h [hrs], m [min]'), 
+            latest:moment(r.substr(0, 8) + 'T' + r.substr(8)).format('MM/DD/YYYY HH:mm a')
+        })
+    })
+
 })
 
 /* OPENSKY API */
