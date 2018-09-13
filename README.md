@@ -5,12 +5,23 @@ Demo application for upcoming events.
 
 ### Application Setup
 
+* Create an Azure Kubernetes Service cluster (use the docs). I used k8s version 1.10.6
+
 * Create an instance of Azure CosmosDB
     ```
     export RGNAME=''
     export COSMOSNAME=''
 
     az cosmosdb create --name $COSMOSNAME --resource-group $RGNAME --kind MongoDB
+    ```
+
+* Create kubernetes secret with cosmos credentials
+    ```
+    export MONGODB_URI=''
+    export MONGODB_USER=''
+    export MONGODB_PASSWORD=''
+
+    kubectl create secret generic cosmos-db-secret --from-literal=uri=$MONGODB_URI --from-literal=user=$MONGODB_USER --from-literal=pwd=$MONGODB_PASSWORD
     ```
 
 * Create images
@@ -31,26 +42,23 @@ Demo application for upcoming events.
     az acr build -t hackfest/service-tracker-ui:$VERSION -r $ACRNAME ./app/service-tracker-ui
     ```
 
-* Create kubernetes secret with cosmos credentials
-    ```
-    export MONGODB_URI=''
-    export MONGODB_USER=''
-    export MONGODB_PASSWORD=''
 
-    kubectl create secret generic cosmos-db-secret --from-literal=uri=$MONGODB_URI --from-literal=user=$MONGODB_USER --from-literal=pwd=$MONGODB_PASSWORD
-    ```
-
-* Deploy app (without Service Mesh)
+* Test deploy app without service mesh
     ```
     kubectl apply -f ./k8s/deploy-app.yaml
     ```
 
-* Load data into Cosmos
+* Load data into Cosmos for each api
     ```
     kubectl port-forward flights-api-5d4886f788-rwbdq 3003:3003
+    
+    
     http://localhost:3003/refresh
+    ```
 
-
+* Remove app to re-deploy with service mesh
+    ```
+    kubectl apply -f ./k8s/deploy-app.yaml
     ```
 
 ### Linkerd 2.0
@@ -81,7 +89,7 @@ helm install install/kubernetes/helm/istio --name istio --namespace istio-system
 kubectl label namespace default istio-injection=enabled
 kubectl get namespace -L istio-injection
 
-* Add Egress rules. 
+* Add Egress rule 
     ```
     kubectl apply -f ./k8s/istio-egress.yaml
     ```
