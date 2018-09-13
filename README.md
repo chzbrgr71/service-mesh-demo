@@ -28,6 +28,7 @@ Demo application for upcoming events.
     ```
     export VERSION=2.0
     export ACRNAME=briaracr
+    export VERSION=slow-response
 
     docker build -t hackfest/data-api:$VERSION -f ./app/data-api/Dockerfile ./app/data-api
     docker build -t hackfest/flights-api:$VERSION -f ./app/flights-api/Dockerfile ./app/flights-api
