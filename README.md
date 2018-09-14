@@ -116,6 +116,7 @@ kubectl get namespace -L istio-injection
 
     ```
     export APP_URL=http://137.135.101.232:3003/latest
+    export APP_URL=http://40.114.29.147:3015/status
     while true; do curl -o /dev/null -s -w "%{http_code}\n" $APP_URL; sleep 1; done
     ```
 
@@ -130,13 +131,13 @@ kubectl get namespace -L istio-injection
     ```
 
     ```
-    for i in 1 2 3 4 5; do
+    for i in 1 2 3; do
         az container create --name flights-load-test${i} -l eastus --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=2 load_url=40.76.219.242:3003/latest
         az container create --name quakes-load-test${i} -l eastus --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=2 load_url=40.117.157.117:3012/latest
         az container create --name weather-load-test${i} -l eastus --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=2 load_url=40.114.29.147:3015/latest
     done
 
-    for i in 1 2 3 4 5; do
+    for i in 1 2 3; do
         az container delete --yes --resource-group aci --name flights-load-test${i}
         az container delete --yes --resource-group aci --name quakes-load-test${i}
         az container delete --yes --resource-group aci --name weather-load-test${i}
