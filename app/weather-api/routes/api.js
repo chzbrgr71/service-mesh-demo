@@ -31,7 +31,13 @@ router.get('/status', (req, res, next) => {
     async.waterfall([
         (cb) => {
             getFromDataApi('get/latest/weather', (e, d) => {
-                cb(null, d.payload[0].Timestamp)
+                if (e) {
+                    res.status(404).end()
+                    next()
+                }
+                else {
+                    cb(null, d.payload[0].Timestamp)
+                }
             })
         }
     ],(e,r) => {
@@ -159,7 +165,13 @@ router.get('/latest', (req, res, next) => {
     async.waterfall([
         (cb) => {
             getFromDataApi('get/latest/weather', (e, d) => {
-                cb(null, d.payload[0].Timestamp)
+                if (e) {
+                    res.status(500).end()
+                    next()
+                }
+                else {
+                    cb(null, d.payload[0].Timestamp)
+                }
             })
         },
         (timestamp, cb) => {

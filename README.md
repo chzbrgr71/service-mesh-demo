@@ -26,10 +26,10 @@ Demo application for upcoming events.
 
 * Create images
     ```
-    export VERSION=2.0
+    export VERSION=2.5
     export ACRNAME=briaracr
-    export VERSION=weather-broken
-    export VERSION=slow-response
+    export VERSION=weather-404
+    export VERSION=quakes-slow
 
     docker build -t hackfest/data-api:$VERSION -f ./app/data-api/Dockerfile ./app/data-api
     docker build -t hackfest/flights-api:$VERSION -f ./app/flights-api/Dockerfile ./app/flights-api
@@ -67,7 +67,7 @@ Demo application for upcoming events.
 
 * Remove app to re-deploy with service mesh
     ```
-    kubectl apply -f ./k8s/deploy-app.yaml
+    kubectl delete -f ./k8s/deploy-app.yaml
     ```
 
 ### Linkerd2
@@ -82,9 +82,16 @@ https://linkerd.io/2/getting-started
     ```
     linkerd inject ./k8s/deploy-app.yaml | kubectl apply -f -
 
-    linkerd inject ./k8s/deploy-app-404.yaml | kubectl apply -f -
+    linkerd inject ./k8s/deploy-app-weather-404.yaml | kubectl apply -f -
 
     linkerd inject ./k8s/deploy-app-quakes-slow.yaml | kubectl apply -f -
+    ```
+
+* TLS
+    ```
+    linkerd install --tls=optional | kubectl apply -f -
+
+    linkerd inject --tls=optional ./k8s/deploy-app.yaml | kubectl apply -f -
     ```
 
 ### Istio (optional)

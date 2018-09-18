@@ -67,12 +67,14 @@ router.get('/latest', (req, res, next) => {
         // Code below is for service mesh demo to simulate delays. Adding this code in /status route as well
 
         // code block 1 for normal operation
-        //jsonResponse.json( res, st.OK.msg, st.OK.code, r) 
+        jsonResponse.json( res, st.OK.msg, st.OK.code, r) 
 
         // code block 2 for random delays
+        /*
         setTimeoutAsync(function () {
             jsonResponse.json( res, st.OK.msg, st.OK.code, r)
         }, Math.floor(Math.random() * 10000) + 1);   
+        */
     })
 
 })
