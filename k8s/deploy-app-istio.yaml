@@ -5,7 +5,7 @@ metadata:
   labels:
     name: service-tracker-ui
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   ports:
   - name: http
     port: 8080
@@ -56,7 +56,7 @@ metadata:
   labels:
     name: flights-api
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   ports:
   - name: http
     port: 3003
@@ -99,7 +99,7 @@ metadata:
   labels:
     name: quakes-api
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   ports:
   - name: http
     port: 3012
@@ -125,6 +125,7 @@ spec:
     spec:
       containers:
         - image: briaracreu.azurecr.io/hackfest/quakes-api:2.5
+        #- image: briaracreu.azurecr.io/hackfest/quakes-api:slow-response
           imagePullPolicy: Always
           name: quakes-api
           env:
@@ -142,7 +143,7 @@ metadata:
   labels:
     name: weather-api
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   ports:
   - name: http
     port: 3015
@@ -185,7 +186,7 @@ metadata:
   labels:
     name: data-api
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   ports:
   - name: http
     port: 3009
@@ -208,7 +209,7 @@ spec:
         app: data-api
     spec:
       containers:
-        - image: briaracreu.azurecr.io/hackfest/data-api:weather-404
+        - image: briaracreu.azurecr.io/hackfest/data-api:2.5
           imagePullPolicy: Always
           name: data-api
           env:
@@ -231,3 +232,94 @@ spec:
           - containerPort: 3009
             protocol: TCP
       restartPolicy: Always
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: service-tracker-gateway
+spec:
+  selector:
+    istio: ingressgateway # use Istio default gateway implementation
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: service-tracker-ui
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - service-tracker-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /ui
+    route:
+    - destination:
+        port:
+          number: 8080
+        host: service-tracker-ui
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: flights-api
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - service-tracker-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /flights
+    route:
+    - destination:
+        port:
+          number: 3003
+        host: flights-api
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: quakes-api
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - service-tracker-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /quakes
+    route:
+    - destination:
+        port:
+          number: 3012
+        host: quakes-api
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: weather-api
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - service-tracker-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /weather
+    route:
+    - destination:
+        port:
+          number: 3015
+        host: weather-api

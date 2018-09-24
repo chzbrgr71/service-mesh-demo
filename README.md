@@ -7,12 +7,14 @@ Demo application for upcoming events.
 
 * Create an Azure Kubernetes Service cluster (use the docs). I used k8s version 1.10.6
 
+* Install Helm (optional)
+
 * Create an instance of Azure CosmosDB
     ```
-    export RGNAME=''
+    export RG_NAME=''
     export COSMOSNAME=''
 
-    az cosmosdb create --name $COSMOSNAME --resource-group $RGNAME --kind MongoDB
+    az cosmosdb create --name $COSMOSNAME --resource-group $RG_NAME --kind MongoDB
     ```
 
 * Create kubernetes secret with cosmos credentials
@@ -24,10 +26,18 @@ Demo application for upcoming events.
     kubectl create secret generic cosmos-db-secret --from-literal=uri=$MONGODB_URI --from-literal=user=$MONGODB_USER --from-literal=pwd=$MONGODB_PASSWORD
     ```
 
+* Create Azure Container Registry
+
+    ```
+    export ACRNAME=briaracreu
+
+    az acr create --resource-group $RG_NAME --name $ACRNAME --sku Basic
+    ```
+
 * Create images
     ```
     export VERSION=2.5
-    export ACRNAME=briaracr
+    export ACRNAME=briaracreu
     export VERSION=weather-404
     export VERSION=quakes-slow
 
@@ -82,9 +92,13 @@ https://linkerd.io/2/getting-started
     ```
     linkerd inject ./k8s/deploy-app.yaml | kubectl apply -f -
 
-    linkerd inject ./k8s/deploy-app-weather-404.yaml | kubectl apply -f -
-
+    # aks-linkerd-eu-100
     linkerd inject ./k8s/deploy-app-quakes-slow.yaml | kubectl apply -f -
+
+    linkerd inject --tls=optional ./k8s/deploy-app-quakes-slow.yaml | kubectl apply -f -
+
+    # aks-linkerd-eu-101
+    linkerd inject ./k8s/deploy-app-weather-404.yaml | kubectl apply -f -
     ```
 
 * TLS
@@ -102,18 +116,41 @@ https://istio.io/docs/setup/kubernetes/helm-install
 
 * Install via Helm
 
-kubectl apply -f install/kubernetes/helm/istio/templates/crds.yaml
+    ```
+    kubectl apply -f install/kubernetes/helm/istio/templates/crds.yaml
+    ```
 
-helm install install/kubernetes/helm/istio --name istio --namespace istio-system --set grafana.enabled=true --set servicegraph.enabled=true --set tracing.enabled=true
+    ```
+    helm install install/kubernetes/helm/istio --name istio --namespace istio-system --set grafana.enabled=true --set servicegraph.enabled=true --set tracing.enabled=true
+    ```
 
-kubectl label namespace default istio-injection=enabled
-kubectl get namespace -L istio-injection
+    ```
+    helm install --name istio install/kubernetes/helm/istio --namespace istio-system \
+    --set global.crds=false \
+    --set global.controlPlaneSecurityEnabled=true \
+    --set global.mtls.enabled=true \
+    --set grafana.enabled=true \
+    --set tracing.enabled=true \
+    --set galley.enabled=false \
+    --values install/kubernetes/helm/istio/values.yaml
+    ```
+
+    ```
+    kubectl label namespace default istio-injection=enabled
+    kubectl get namespace -L istio-injection
+    ```
 
 * Add Egress rule 
+
     ```
     kubectl apply -f ./k8s/istio-egress.yaml
     ```
 
+* Install
+
+    ```
+    kubectl apply -f ./k8s/deploy-app-istio.yaml
+    ```
 
 ### Do Stuff
 
@@ -138,19 +175,44 @@ kubectl get namespace -L istio-injection
     ```
 
     ```
-    for i in 1 2 3; do
-        az container create --name flights-load-test${i} -l eastus --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=2 load_url=40.76.219.242:3003/latest
-        az container create --name quakes-load-test${i} -l eastus --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=2 load_url=40.117.157.117:3012/latest
-        az container create --name weather-load-test${i} -l eastus --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=2 load_url=40.114.29.147:3015/latest
+    # aks-linkerd-eu-100
+    export FLIGHTS_IP=23.96.116.161
+    export QUAKES_IP=23.96.122.112
+    export WEATHER_IP=23.96.127.41
+    
+    for i in 1 2 3 4 5; do
+        az container create --name flights-load-test${i} -l eastus --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=2 load_url=$FLIGHTS_IP:3003/latest
+        az container create --name quakes-load-test${i} -l eastus --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=2 load_url=$QUAKES_IP:3012/latest
+        az container create --name weather-load-test${i} -l eastus --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=2 load_url=$WEATHER_IP:3015/latest
     done
 
-    for i in 1 2 3; do
+    for i in 1 2 3 4 5; do
         az container delete --yes --resource-group aci --name flights-load-test${i}
         az container delete --yes --resource-group aci --name quakes-load-test${i}
         az container delete --yes --resource-group aci --name weather-load-test${i}
     done
 
+    # aks-linkerd-eu-101
+    export FLIGHTS_IP=23.96.87.96
+    export QUAKES_IP=137.117.39.246
+    export WEATHER_IP=23.96.87.18
+
+    for i in 1 2 3 4 5; do
+        az container create --name flights-load-testb${i} -l eastus --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=2 load_url=$FLIGHTS_IP:3003/latest
+        az container create --name quakes-load-testb${i} -l eastus --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=2 load_url=$QUAKES_IP:3012/latest
+        az container create --name weather-load-testb${i} -l eastus --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=2 load_url=$WEATHER_IP:3015/latest
+    done
+
+    for i in 1 2 3 4 5; do
+        az container delete --yes --resource-group aci --name flights-load-testb${i}
+        az container delete --yes --resource-group aci --name quakes-load-testb${i}
+        az container delete --yes --resource-group aci --name weather-load-testb${i}
+    done
+    ```
+
+    ```
     # single instance
+
     az container create --name flights-load-test1 -l eastus --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=2 load_url=40.76.219.242:3003/latest
     az container create --name quakes-load-test1 -l eastus --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=2 load_url=40.117.157.117:3012/latest
     az container create --name weather-load-test1 -l eastus --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=2 load_url=40.114.29.147:3015/latest
@@ -159,10 +221,12 @@ kubectl get namespace -L istio-injection
     az container delete --yes --resource-group aci --name quakes-load-test1
     az container delete --yes --resource-group aci --name weather-load-test1
     ```
+
     Web UI: http://40.76.210.156:8080
 
 
     Change deployment image tag:
+    
     ```
     kubectl set image deployment/quakes-api quakes-api=briaracr.azurecr.io/hackfest/quakes-api:v5
 

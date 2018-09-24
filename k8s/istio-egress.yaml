@@ -4,9 +4,9 @@ metadata:
   name: cosmos-db
 spec:
   hosts:
-  - service-mesh-demo.documents.azure.com
+  - service-mesh-demo-eu.documents.azure.com
   addresses:
-  - 104.45.131.193/27
+  - 40.78.226.8/27
   ports:
   - number: 10255
     protocol: mongo
@@ -16,7 +16,7 @@ spec:
 apiVersion: networking.istio.io/v1alpha3
 kind: ServiceEntry
 metadata:
-  name: opensky
+  name: flights
 spec:
   hosts:
   - opensky-network.org
@@ -24,3 +24,27 @@ spec:
   - number: 443
     name: https
     protocol: HTTPS
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: quakes
+spec:
+  hosts:
+  - earthquake.usgs.gov
+  ports:
+  - number: 443
+    name: https
+    protocol: HTTPS
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: weather
+spec:
+  hosts:
+  - dataservice.accuweather.com
+  ports:
+  - number: 80
+    name: http
+    protocol: HTTP
