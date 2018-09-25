@@ -41,7 +41,7 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: spec.nodeName
-        image: briaracreu.azurecr.io/hackfest/service-tracker-ui:2.5
+        image: briaracreu.azurecr.io/hackfest/service-tracker-ui:2.5b
         imagePullPolicy: Always
         name: service-tracker-ui
         ports:

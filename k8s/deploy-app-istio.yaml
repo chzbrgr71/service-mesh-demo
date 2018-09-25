@@ -41,7 +41,7 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: spec.nodeName
-        image: briaracreu.azurecr.io/hackfest/service-tracker-ui:2.5
+        image: briaracreu.azurecr.io/hackfest/service-tracker-ui:2.5-istio
         imagePullPolicy: Always
         name: service-tracker-ui
         ports:
@@ -56,7 +56,7 @@ metadata:
   labels:
     name: flights-api
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   ports:
   - name: http
     port: 3003
@@ -99,7 +99,7 @@ metadata:
   labels:
     name: quakes-api
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   ports:
   - name: http
     port: 3012
@@ -125,7 +125,6 @@ spec:
     spec:
       containers:
         - image: briaracreu.azurecr.io/hackfest/quakes-api:2.5
-        #- image: briaracreu.azurecr.io/hackfest/quakes-api:slow-response
           imagePullPolicy: Always
           name: quakes-api
           env:
@@ -143,7 +142,7 @@ metadata:
   labels:
     name: weather-api
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   ports:
   - name: http
     port: 3015
@@ -199,7 +198,7 @@ kind: Deployment
 metadata:
   name: data-api
 spec:
-  replicas: 6
+  replicas: 1
   selector:
     matchLabels:
       app: data-api
@@ -207,6 +206,47 @@ spec:
     metadata:
       labels:
         app: data-api
+        version: prod        
+    spec:
+      containers:
+        - image: briaracreu.azurecr.io/hackfest/data-api:2.5
+          imagePullPolicy: Always
+          name: data-api
+          env:
+            - name: MONGODB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: cosmos-db-secret
+                  key: uri
+            - name: MONGODB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: cosmos-db-secret
+                  key: user
+            - name: MONGODB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cosmos-db-secret
+                  key: pwd
+          ports:
+          - containerPort: 3009
+            protocol: TCP
+      restartPolicy: Always
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: data-api-canary
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: data-api
+  template:
+    metadata:
+      labels:
+        app: data-api
+        version: canary        
     spec:
       containers:
         - image: briaracreu.azurecr.io/hackfest/data-api:2.5
@@ -260,31 +300,12 @@ spec:
   http:
   - match:
     - uri:
-        prefix: /ui
+        prefix: /
     route:
     - destination:
         port:
           number: 8080
         host: service-tracker-ui
----
-apiVersion: networking.istio.io/v1alpha3
-kind: VirtualService
-metadata:
-  name: flights-api
-spec:
-  hosts:
-  - "*"
-  gateways:
-  - service-tracker-gateway
-  http:
-  - match:
-    - uri:
-        prefix: /flights
-    route:
-    - destination:
-        port:
-          number: 3003
-        host: flights-api
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
@@ -298,7 +319,7 @@ spec:
   http:
   - match:
     - uri:
-        prefix: /quakes
+        prefix: /latest
     route:
     - destination:
         port:
@@ -306,20 +327,84 @@ spec:
         host: quakes-api
 ---
 apiVersion: networking.istio.io/v1alpha3
-kind: VirtualService
+kind: ServiceEntry
 metadata:
-  name: weather-api
+  name: cosmos-db
 spec:
   hosts:
-  - "*"
-  gateways:
-  - service-tracker-gateway
+  - service-mesh-demo-eu2.documents.azure.com
+  addresses:
+  - 13.69.66.129/27
+  ports:
+  - number: 10255
+    protocol: mongo
+    name: mongo-port
+  resolution: NONE
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: flights
+spec:
+  hosts:
+  - opensky-network.org
+  ports:
+  - number: 443
+    name: https
+    protocol: HTTPS
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: quakes
+spec:
+  hosts:
+  - earthquake.usgs.gov
+  ports:
+  - number: 443
+    name: https
+    protocol: HTTPS
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: weather
+spec:
+  hosts:
+  - dataservice.accuweather.com
+  ports:
+  - number: 80
+    name: http
+    protocol: HTTP
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: data-api-routes
+spec:
+  hosts:
+    - data-api
   http:
-  - match:
-    - uri:
-        prefix: /weather
-    route:
+  - route:
     - destination:
-        port:
-          number: 3015
-        host: weather-api
+        host: data-api
+        subset: prod
+      weight: 85
+    - destination:
+        host: data-api
+        subset: canary
+      weight: 15
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: data-api
+spec:
+  host: data-api
+  subsets:
+  - name: prod
+    labels:
+      version: prod
+  - name: canary
+    labels:
+      version: canary
