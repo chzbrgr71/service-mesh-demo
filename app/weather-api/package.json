@@ -8,6 +8,7 @@
     "container": "NODE_ENV=container node ./bin/www"
   },
   "dependencies": {
+    "@risingstack/opentracing-auto": "^1.5.2",
     "async": "^2.6.1",
     "body-parser": "^1.18.3",
     "cookie-parser": "~1.4.3",

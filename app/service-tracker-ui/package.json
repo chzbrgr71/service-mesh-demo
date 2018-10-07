@@ -8,6 +8,7 @@
     "container": "vue-cli-service serve"
   },
   "dependencies": {
+    "@risingstack/opentracing-auto": "^1.5.2",
     "bootstrap": "^4.0.0",
     "chartist": "^0.11.0",
     "es6-promise": "^4.2.4",

@@ -64,9 +64,9 @@ router.get('/get/latest/quakes', (req, res, next) => {
 router.get('/get/latest/weather', (req, res, next) => {
     getLatestFromDb(LatestWeather, (err, data) => {
         // swap the two below statements to force a 404 for demo purposes
-        //jsonResponse.json( res, 'success', st.OK.code, data )
+        jsonResponse.json( res, 'success', st.OK.code, data )
 
-        res.status(404).end()
+        //res.status(404).end()
     })
 })
 

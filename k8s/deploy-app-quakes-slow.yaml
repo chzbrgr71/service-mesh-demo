@@ -41,7 +41,7 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: spec.nodeName
-        image: briaracreu.azurecr.io/hackfest/service-tracker-ui:2.5a
+        image: briaracreu.azurecr.io/hackfest/service-tracker-ui:3.0b
         imagePullPolicy: Always
         name: service-tracker-ui
         ports:
@@ -81,7 +81,7 @@ spec:
         app: flights-api
     spec:
       containers:
-        - image: briaracreu.azurecr.io/hackfest/flights-api:2.5
+        - image: briaracreu.azurecr.io/hackfest/flights-api:3.0
           imagePullPolicy: Always
           name: flights-api
           env:
@@ -168,7 +168,7 @@ spec:
         app: weather-api
     spec:
       containers:
-        - image: briaracreu.azurecr.io/hackfest/weather-api:2.5
+        - image: briaracreu.azurecr.io/hackfest/weather-api:3.0
           imagePullPolicy: Always
           name: weather-api
           env:
@@ -209,7 +209,7 @@ spec:
         app: data-api
     spec:
       containers:
-        - image: briaracreu.azurecr.io/hackfest/data-api:2.5
+        - image: briaracreu.azurecr.io/hackfest/data-api:3.0
           imagePullPolicy: Always
           name: data-api
           env:

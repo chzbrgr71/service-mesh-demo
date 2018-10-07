@@ -41,7 +41,7 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: spec.nodeName
-        image: briaracreu.azurecr.io/hackfest/service-tracker-ui:2.5-istio
+        image: briaracreu.azurecr.io/hackfest/service-tracker-ui:3.0-istio
         imagePullPolicy: Always
         name: service-tracker-ui
         ports:
@@ -81,7 +81,7 @@ spec:
         app: flights-api
     spec:
       containers:
-        - image: briaracreu.azurecr.io/hackfest/flights-api:2.5
+        - image: briaracreu.azurecr.io/hackfest/flights-api:3.0
           imagePullPolicy: Always
           name: flights-api
           env:
@@ -124,7 +124,7 @@ spec:
         app: quakes-api
     spec:
       containers:
-        - image: briaracreu.azurecr.io/hackfest/quakes-api:2.5
+        - image: briaracreu.azurecr.io/hackfest/quakes-api:3.0
           imagePullPolicy: Always
           name: quakes-api
           env:
@@ -167,7 +167,7 @@ spec:
         app: weather-api
     spec:
       containers:
-        - image: briaracreu.azurecr.io/hackfest/weather-api:2.5
+        - image: briaracreu.azurecr.io/hackfest/weather-api:3.0
           imagePullPolicy: Always
           name: weather-api
           env:
@@ -209,7 +209,7 @@ spec:
         version: prod        
     spec:
       containers:
-        - image: briaracreu.azurecr.io/hackfest/data-api:2.5
+        - image: briaracreu.azurecr.io/hackfest/data-api:3.0
           imagePullPolicy: Always
           name: data-api
           env:
@@ -249,7 +249,7 @@ spec:
         version: canary        
     spec:
       containers:
-        - image: briaracreu.azurecr.io/hackfest/data-api:2.5
+        - image: briaracreu.azurecr.io/hackfest/data-api:3.0
           imagePullPolicy: Always
           name: data-api
           env:
@@ -332,9 +332,9 @@ metadata:
   name: cosmos-db
 spec:
   hosts:
-  - service-mesh-demo-eu2.documents.azure.com
+  - briarcosmos200.documents.azure.com
   addresses:
-  - 13.69.66.129/27
+  - 52.170.204.83/27
   ports:
   - number: 10255
     protocol: mongo

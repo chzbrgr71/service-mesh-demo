@@ -43,7 +43,7 @@ Demo application for upcoming events.
 
 * Create an instance of Azure CosmosDB
     ```
-    export RG_NAME=''
+    export RG_NAME='service-mesh-demo'
     export COSMOSNAME=''
 
     az cosmosdb create --name $COSMOSNAME --resource-group $RG_NAME --kind MongoDB
@@ -66,7 +66,7 @@ Demo application for upcoming events.
 * Create Azure Container Registry
 
     ```
-    export ACRNAME=briaracreu
+    export ACRNAME=briaracr
 
     az acr create --resource-group $RG_NAME --name $ACRNAME --sku Basic
     ```
@@ -74,8 +74,8 @@ Demo application for upcoming events.
 * Create images
 
     ```
-    export ACRNAME=briaracreu
-    export VERSION=2.5-istio
+    export ACRNAME=briaracr
+    export VERSION=3.0b
     export VERSION=weather-404
     export VERSION=quakes-slow
 
@@ -125,20 +125,22 @@ https://linkerd.io/2/getting-started
     ```
 
     * Or with TLS
-        ```
-        linkerd install --tls=optional | kubectl apply -f -
-        ```
+    ```
+    linkerd install --tls=optional | kubectl apply -f -
+    ```
 
 * Deploy the app with linkerd sidecar injected
     ```
     linkerd inject ./k8s/deploy-app.yaml | kubectl apply -f -
 
-    # aks-linkerd-eu-100
+    linkerd inject ./k8s/deploy-app.yaml | kubectl delete -f -
+
+    # linkerd-aks-01
     linkerd inject ./k8s/deploy-app-quakes-slow.yaml | kubectl apply -f -
     OR
     linkerd inject --tls=optional ./k8s/deploy-app-quakes-slow.yaml | kubectl apply -f -
 
-    # aks-linkerd-eu-101
+    # linkerd-aks-02
     linkerd inject ./k8s/deploy-app-weather-404.yaml | kubectl apply -f -
     OR
     linkerd inject --tls=optional ./k8s/deploy-app-weather-404.yaml | kubectl apply -f -
@@ -202,7 +204,7 @@ https://istio.io/docs/setup/kubernetes/helm-install
     via bash
 
     ```
-    export APP_URL=http://13.68.196.193/latest
+    export APP_URL=http://23.96.37.204:3003/latest
     
     while true; do curl -o /dev/null -s -w "%{http_code}\n" $APP_URL; sleep 1; done
     ```
