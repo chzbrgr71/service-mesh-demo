@@ -133,21 +133,21 @@ https://linkerd.io/2/getting-started
     ```
     linkerd inject ./k8s/deploy-app.yaml | kubectl apply -f -
 
+    # remove
     linkerd inject ./k8s/deploy-app.yaml | kubectl delete -f -
 
     # linkerd-aks-01
-    linkerd inject ./k8s/deploy-app-quakes-slow.yaml | kubectl apply -f -
-    OR
-    linkerd inject --tls=optional ./k8s/deploy-app-quakes-slow.yaml | kubectl apply -f -
-
-    # linkerd-aks-02
     linkerd inject ./k8s/deploy-app-weather-404.yaml | kubectl apply -f -
     OR
     linkerd inject --tls=optional ./k8s/deploy-app-weather-404.yaml | kubectl apply -f -
     ```
 
+    # linkerd-aks-02
+    linkerd inject ./k8s/deploy-app-quakes-slow.yaml | kubectl apply -f -
+    OR
+    linkerd inject --tls=optional ./k8s/deploy-app-quakes-slow.yaml | kubectl apply -f -
+
     to remove: 
-        
     ```
     linkerd inject ./k8s/deploy-app-quakes-slow.yaml | kubectl delete -f -
     linkerd inject ./k8s/deploy-app-weather-404.yaml | kubectl delete -f -
@@ -160,18 +160,6 @@ Using istio release 1.0.1
 https://istio.io/docs/setup/kubernetes/helm-install
 
 * Install via Helm
-
-    ```
-    # can potentially skip this step if using Helm below
-
-    kubectl apply -f install/kubernetes/helm/istio/templates/crds.yaml
-    ```
-
-    ```
-    # run from the istio release root directory
-
-    helm install install/kubernetes/helm/istio --name istio --namespace istio-system --set grafana.enabled=true --set servicegraph.enabled=true --set tracing.enabled=true
-    ```
 
     ```
     helm install --name istio install/kubernetes/helm/istio --namespace istio-system \
@@ -191,7 +179,7 @@ https://istio.io/docs/setup/kubernetes/helm-install
 
 * Update istio egress rules in `deploy-app-istio.yaml` to match the external IP's for your services (mainly Cosmos)
 
-* Install
+* Install app
 
     ```
     kubectl apply -f ./k8s/deploy-app-istio.yaml
@@ -204,7 +192,7 @@ https://istio.io/docs/setup/kubernetes/helm-install
     via bash
 
     ```
-    export APP_URL=http://23.96.37.204:3003/latest
+    export APP_URL=http://138.91.125.99/latest
     
     while true; do curl -o /dev/null -s -w "%{http_code}\n" $APP_URL; sleep 1; done
     ```
@@ -212,18 +200,18 @@ https://istio.io/docs/setup/kubernetes/helm-install
     via container
 
     ```
-    docker run -d --name load-test1 -e "load_duration=-1" -e "load_rate=1" -e "load_url=137.135.101.232:3003/latest" chzbrgr71/loadtest
+    docker run -d --name load-test1 -e "load_duration=-1" -e "load_rate=1" -e "load_url=138.91.125.99/latest" chzbrgr71/loadtest
 
-    az container create --name load-test1 --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=5 load_url=13.68.196.193/latest
+    az container create --name load-test1 --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=5 load_url=138.91.125.99/latest
 
     az container delete --yes --resource-group aci --name load-test1
     ```
 
     ```
-    # aks-linkerd-eu-100
-    export FLIGHTS_IP=104.41.132.175
-    export QUAKES_IP=40.114.86.117
-    export WEATHER_IP=137.117.109.171
+    # linkerd-aks-01
+    export FLIGHTS_IP=
+    export QUAKES_IP=
+    export WEATHER_IP=
     
     for i in 1 2 3; do
         az container create --name flights-load-test${i} -l eastus --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=2 load_url=$FLIGHTS_IP:3003/latest
@@ -237,10 +225,10 @@ https://istio.io/docs/setup/kubernetes/helm-install
         az container delete --yes --resource-group aci --name weather-load-test${i}
     done
 
-    # aks-linkerd-eu-101
-    export FLIGHTS_IP=23.96.16.35
-    export QUAKES_IP=168.62.172.68
-    export WEATHER_IP=23.96.18.179
+    # linkerd-aks-02
+    export FLIGHTS_IP=
+    export QUAKES_IP=
+    export WEATHER_IP=
 
     for i in 1 2 3; do
         az container create --name flights-load-testb${i} -l eastus --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=2 load_url=$FLIGHTS_IP:3003/latest
@@ -258,8 +246,6 @@ https://istio.io/docs/setup/kubernetes/helm-install
 * Change deployment image tag:
     
     ```
-    kubectl set image deployment/quakes-api quakes-api=briaracr.azurecr.io/hackfest/quakes-api:v5
-
     kubectl set image deployment/quakes-api quakes-api=briaracr.azurecr.io/hackfest/quakes-api:v5.1
     kubectl set image deployment/flights-api flights-api=briaracr.azurecr.io/hackfest/flights-api:v5.12
     ```
