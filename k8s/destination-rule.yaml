@@ -1,0 +1,13 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: data-api
+spec:
+  host: data-api
+  subsets:
+  - name: prod
+    labels:
+      version: prod
+  - name: canary
+    labels:
+      version: canary

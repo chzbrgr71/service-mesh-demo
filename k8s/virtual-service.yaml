@@ -1,0 +1,17 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: data-api-routes
+spec:
+  hosts:
+    - data-api
+  http:
+  - route:
+    - destination:
+        host: data-api
+        subset: prod
+      weight: 85
+    - destination:
+        host: data-api
+        subset: canary
+      weight: 15

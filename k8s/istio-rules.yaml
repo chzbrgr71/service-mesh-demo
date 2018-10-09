@@ -1,0 +1,103 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: service-tracker-gateway
+spec:
+  selector:
+    istio: ingressgateway # use Istio default gateway implementation
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: service-tracker-ui
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - service-tracker-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        port:
+          number: 8080
+        host: service-tracker-ui
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: quakes-api
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - service-tracker-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /latest
+    route:
+    - destination:
+        port:
+          number: 3012
+        host: quakes-api
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: cosmos-db
+spec:
+  hosts:
+  - briarcosmos200.documents.azure.com
+  addresses:
+  - 52.170.204.83/27
+  ports:
+  - number: 10255
+    protocol: mongo
+    name: mongo-port
+  resolution: NONE
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: flights
+spec:
+  hosts:
+  - opensky-network.org
+  ports:
+  - number: 443
+    name: https
+    protocol: HTTPS
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: quakes
+spec:
+  hosts:
+  - earthquake.usgs.gov
+  ports:
+  - number: 443
+    name: https
+    protocol: HTTPS
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: weather
+spec:
+  hosts:
+  - dataservice.accuweather.com
+  ports:
+  - number: 80
+    name: http
+    protocol: HTTP

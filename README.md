@@ -20,8 +20,8 @@ Demo application for upcoming events.
 
     ```
     RG_NAME=service-mesh-demo
-    CLUSTER_NAME=aks-service-mesh
-    LOCATION=westeurope
+    CLUSTER_NAME=istio-aks-02
+    LOCATION=westus
     SP_ID=<replace>
     SP_SECRET=<replace>
     K8S_VERSION=1.10.6
@@ -182,6 +182,9 @@ https://istio.io/docs/setup/kubernetes/helm-install
 * Install app
 
     ```
+    kubectl apply -f ./k8s/istio-rules.yaml
+    kubectl apply -f ./k8s/destination-rule.yaml
+    kubectl apply -f ./k8s/virtual-service.yaml
     kubectl apply -f ./k8s/deploy-app-istio.yaml
     ```
 
@@ -192,7 +195,7 @@ https://istio.io/docs/setup/kubernetes/helm-install
     via bash
 
     ```
-    export APP_URL=http://138.91.125.99/latest
+    export APP_URL=http://23.96.22.103/latest
     
     while true; do curl -o /dev/null -s -w "%{http_code}\n" $APP_URL; sleep 1; done
     ```
@@ -200,11 +203,11 @@ https://istio.io/docs/setup/kubernetes/helm-install
     via container
 
     ```
-    docker run -d --name load-test1 -e "load_duration=-1" -e "load_rate=1" -e "load_url=138.91.125.99/latest" chzbrgr71/loadtest
+    docker run -d --name load-test1 -e "load_duration=-1" -e "load_rate=1" -e "load_url=23.96.22.103/latest" chzbrgr71/loadtest
 
-    az container create --name load-test1 --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=5 load_url=138.91.125.99/latest
+    az container create --name istio-load-test1 --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=5 load_url=23.96.22.103/latest
 
-    az container delete --yes --resource-group aci --name load-test1
+    az container delete --yes --resource-group aci --name istio-load-test1
     ```
 
     ```
@@ -226,9 +229,9 @@ https://istio.io/docs/setup/kubernetes/helm-install
     done
 
     # linkerd-aks-02
-    export FLIGHTS_IP=
-    export QUAKES_IP=
-    export WEATHER_IP=
+    export FLIGHTS_IP=40.87.9.175
+    export QUAKES_IP=40.87.10.211
+    export WEATHER_IP=40.87.13.103
 
     for i in 1 2 3; do
         az container create --name flights-load-testb${i} -l eastus --image chzbrgr71/loadtest --resource-group aci -o tsv --cpu 1 --memory 1 --environment-variables load_duration=-1 load_rate=2 load_url=$FLIGHTS_IP:3003/latest
